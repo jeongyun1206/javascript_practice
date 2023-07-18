@@ -17,6 +17,7 @@ const responsePage = async function (req, res, type, parsedUrl) {
     res.writeHead(200);
     res.end(page.getPage());
 }
+
 const process = async function (req, res, type) {
     let body = '';
     req.on('data', (data) => { body += data; });
@@ -27,16 +28,24 @@ const process = async function (req, res, type) {
             const filteredTitle = path.parse(post.title).base;
             await query('UPDATE topic SET title=?, description=?, author_id=? WHERE id=?', [filteredTitle, post.description, post.author, filteredId]);
             res.writeHead(302, {Location: `/?id=${filteredId}`});
-        }
-        else if (type === 'create') {
+        } else if (type === 'create') {
             const filteredTitle = path.parse(post.title).base;
             const queryResult = await query(`INSERT INTO topic (title, description, created, author_id) VALUES(?, ?, NOW(), ?)`, [filteredTitle, post.description, post.author]);
             res.writeHead(302, {Location: `/?id=${queryResult.insertId}`});
-        }
-        else if (type === 'delete') {
+        } else if (type === 'delete') {
             const filteredId = path.parse(post.id).base;
             await query('DELETE FROM topic WHERE id=?', [filteredId]);
             res.writeHead(302, {Location: `/`});
+        } else if (type === 'author_update') {
+            const filteredId = path.parse(post.id).base;
+            await query('UPDATE author SET name=?, profile=? WHERE id=?', [post.name, post.profile, filteredId]);
+            res.writeHead(302, {Location: `/author`});
+        } else if (type === 'author_create') {
+            await query(`INSERT INTO author (name, profile) VALUES(?, ?)`, [post.name, post.profile]);
+            res.writeHead(302, {Location: `/author`});
+        } else if (type === 'author_delete') {
+            await query('DELETE FROM author WHERE id=?', [post.id]);
+            res.writeHead(302, {Location: `/author`});
         }
         res.end();
     })
@@ -51,12 +60,24 @@ const server = http.createServer(async function (req, res) {
             responsePage(req, res, 'create', parsedUrl);
         } else if (parsedUrl.pathname === '/update') {
             responsePage(req, res, 'update', parsedUrl);
+        } else if (parsedUrl.pathname === '/author') {
+            responsePage(req, res, 'author', parsedUrl);
+        } else if (parsedUrl.pathname === '/author_update') {
+            responsePage(req, res, 'author_update', parsedUrl);
+        } else if (parsedUrl.pathname === '/author_create') {
+            responsePage(req, res, 'author_create', parsedUrl);
         } else if (parsedUrl.pathname === '/create_process') {
             process(req, res, 'create', parsedUrl);
         } else if (parsedUrl.pathname === '/update_process') {
             process(req, res, 'update', parsedUrl);
         } else if (parsedUrl.pathname === '/delete_process') {
             process(req, res, 'delete', parsedUrl);
+        } else if (parsedUrl.pathname === '/author_update_process') {
+            process(req, res, 'author_update', parsedUrl);
+        } else if (parsedUrl.pathname === '/author_create_process') {
+            process(req, res, 'author_create', parsedUrl);
+        } else if (parsedUrl.pathname === '/author_delete_process') {
+            process(req, res, 'author_delete', parsedUrl);
         } else {
             responsePage(req, res, '404', parsedUrl);
         }
