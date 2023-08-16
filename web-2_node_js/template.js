@@ -29,7 +29,7 @@ class Template {
                         </p>
                         </body>
                         </html>
-                        `
+                    `
         } else {
             this.form = await this.getForm(method);
             this.template = `

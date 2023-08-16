@@ -1,0 +1,293 @@
+const sanitizeHtml = require('sanitize-html');
+
+class Page {
+    constructor(path, loginStatus, obj) {
+        if (path == '/') {
+            this.setHomePage(obj, loginStatus);
+        } else if (path == '/page/:pageId') {
+            this.setDescriptionPage(obj);
+        } else if (path == '/login') {
+            this.setLoginPage(obj);
+        } else if (path == '/page/create') {
+            this.setCreatePage(obj);
+        } else if (path == '/page/update/:pageId') {
+            this.setUpdatePage(obj);
+        } else if (path == '/author') {
+            this.setAuthorPage(obj);
+        } else if (path == '/author/update/:authorId') {
+            this.setAuthorUpdatePage(obj);
+        } else if (path == '/author/create/') {
+            this.setAuthorCreatePage(obj);
+        }
+    }
+    getPage() {
+        return (this.page);
+    }
+    setLoginPage(obj) {
+        this.page = 
+        `<!doctype html>
+        <html>
+        <head>
+        <title>WEB1 - welcome</title>
+        <meta charset="utf-8">
+        </head>
+        <body>
+        <h1><a href="/">WEB</a></h1>
+        <form action="http://localhost:8080/login_process" method="post">
+            <p>
+                <input type="text" name="id" placeholder="id">
+            </p>
+            <p>
+                <input type="password" name="password" placeholder="password">
+            </p>
+            <p>
+                <input type="submit">
+            </p>
+        </form>
+        ${this.getTopicSelector(obj)}
+        <a href="/page/create">create</a> 
+        <a href="/author">author</a> 
+        <h2>welcome</h2>
+        <p>Hello Node.js!</p>
+        </body>
+        </html>
+        `
+    }
+    setAuthorPage(obj) {
+        this.page = 
+        `<!doctype html>
+        <html>
+        <head>
+        <title>WEB1 - author</title>
+        <meta charset="utf-8">
+        </head>
+        <body>
+        <h1><a href="/">WEB</a></h1>
+        ${this.getTopicSelector(obj)}
+        <h2>Author List</h2>
+        <a href="/author/create">create</a>
+        ${this.getAuthorTable(obj)}
+        </body>
+        </html>
+        ` 
+    }
+    setAuthorUpdatePage(obj) {
+        this.page = 
+        `<!doctype html>
+        <html>
+        <head>
+        <title>WEB1 - author</title>
+        <meta charset="utf-8">
+        </head>
+        <body>
+        <h1><a href="/">WEB</a></h1>
+        ${this.getTopicSelector(obj)}
+        <h2>Author List</h2>
+        ${this.getAuthorTable(obj)}
+        <p>
+        <form action="http://localhost:8080/author/update_process" method="post">
+            <input type="hidden" name="id" value="${obj.authorContent.id}" ></input>
+            <p>
+                <input type="text" name="name" placeholder="name" value="${sanitizeHtml(obj.authorContent.name)}">
+            </p>
+            <p>
+                <textarea name="profile" placeholder="profile">${sanitizeHtml(obj.authorContent.profile)}</textarea>
+            </p>
+            <p>
+                <input type="submit">
+            </p>
+        </form>
+        </p>
+        </body>
+        </html>
+        ` 
+    }
+    setAuthorCreatePage(obj) {
+        this.page = 
+        `<!doctype html>
+        <html>
+        <head>
+        <title>WEB1 - author</title>
+        <meta charset="utf-8">
+        </head>
+        <body>
+        <h1><a href="/">WEB</a></h1>
+        ${this.getTopicSelector(obj)}
+        <h2>Author List</h2>
+        ${this.getAuthorTable(obj)}
+        <form action="http://localhost:8080/author/create_process" method="post">
+            <p>
+                <input type="text" name="name" placeholder="name">
+            </p>
+            <p>
+                <textarea name=profile placeholder="profile"></textarea>
+            </p>
+            <p>
+                <input type="submit">
+            </p>
+        </form>
+        </body>
+        </html>
+        ` 
+
+    }
+    setHomePage(obj, loginStatus) {
+        this.page = 
+        `<!doctype html>
+        <html>
+        <head>
+        <title>WEB1 - welcome</title>
+        <meta charset="utf-8">
+        </head>
+        <body>
+        <h1><a href="/">WEB</a></h1>
+        ${this.getLoginButton(loginStatus)}
+        ${this.getTopicSelector(obj)}
+        <a href="/page/create">create</a> 
+        <a href="/author">author</a> 
+        <h2>welcome</h2>
+        <p>Hello Node.js!</p>
+        </body>
+        </html>
+        `
+    }
+    setDescriptionPage(obj) {
+        this.page = 
+        `<!doctype html>
+        <html>
+        <head>
+        <title>WEB1 - ${sanitizeHtml(obj.topicContent.title)}</title>
+        <meta charset="utf-8">
+        </head>
+        <body>
+        <h1><a href="/">WEB</a></h1>
+        ${this.getTopicSelector(obj)}
+        <a href="/page/create">create</a> 
+        <a href="/page/update/${obj.topicContent.id}">update</a> 
+        <form action="/page/delete_process" method="post"> 
+            <input type="hidden" name="id" value="${obj.topicContent.id}"> 
+            <input type="submit" value="delete"> 
+        </form>
+        <a href="/author">author</a> 
+        <h2>${sanitizeHtml(obj.topicContent.title)}</h2>
+        <p>
+            ${sanitizeHtml(obj.topicContent.description)}
+        </p>
+        <p>by ${sanitizeHtml(obj.topicContent.name)}</p>
+        </body>
+        </html>
+        `
+    }
+    setCreatePage(obj) {
+        this.page =
+        `<!doctype html>
+        <html>
+        <head>
+        <title>WEB1 - create</title>
+        <meta charset="utf-8">
+        </head>
+        <body>
+        <h1><a href="/">WEB</a></h1>
+        ${this.getTopicSelector(obj)}
+        <p>
+        <form action="http://localhost:8080/page/create_process" method="post">
+            <p>
+                <input type="text" name="title" placeholder="title">
+            </p>
+            <p>
+                <textarea name="description" placeholder="description" ></textarea>
+            </p>
+            <p>
+                ${this.getAuthorSelector(obj, 'create')}
+            </p>
+            <p>
+                <input type="submit">
+            </p>
+        </form>
+        </p>
+        </body>
+        </html>
+        `
+    }
+    setUpdatePage(obj) {
+        this.page =
+        `<!doctype html>
+        <html>
+        <head>
+        <title>WEB1 - ${sanitizeHtml(obj.topicContent.title)}</title>
+        <meta charset="utf-8">
+        </head>
+        <body>
+        <h1><a href="/">WEB</a></h1>
+        ${this.getTopicSelector(obj)}
+        <p>
+        <form action="http://localhost:8080/page/update_process" method="post">
+            <input type="hidden" name="id" value="${obj.topicContent.id}" ></input>
+            <p>
+                <input type="text" name="title" placeholder="title" value="${sanitizeHtml(obj.topicContent.title)}">
+            </p>
+            <p>
+                <textarea name="description" placeholder="description">${sanitizeHtml(obj.topicContent.description)}</textarea>
+            </p>
+            <p>
+                ${this.getAuthorSelector(obj, 'update')}
+            </p>
+            <p>
+                <input type="submit">
+            </p>
+        </form>
+        </p>
+        </body>
+        </html>
+        `
+    }
+    getTopicSelector(obj) {
+        let list = '<ul>';
+        for (let dataElement of obj.allTopics) {
+            list += `<li><a href="/page/${dataElement.id}">${sanitizeHtml(dataElement.title)}</a></li>`
+        }
+        list += '</ul>'
+        return (list);
+    }
+    getAuthorSelector(obj, type) {
+        let list = '<select name="author">';
+        for (const dataElement of obj.allAuthors) {
+            if (type === 'update' && dataElement.id == obj.topicContent.author_id)
+                list += `<option value=${dataElement.id} selected>${sanitizeHtml(dataElement.name)}</a></option>`
+            else
+                list += `<option value=${dataElement.id}>${sanitizeHtml(dataElement.name)}</a></option>`
+        }
+        list += '</select>'
+        return (list);
+    }
+    getAuthorTable(obj) {
+        let table = 
+        `<table border="1">
+        <th>name</th>
+        <th>profile</th>
+        <th>update</th>
+        <th>delete</th>`;
+        for (let author of obj.allAuthors) {
+            table += `<tr>`
+            table += `<td>${sanitizeHtml(author.name)}</td>`;
+            table += `<td>${sanitizeHtml(author.profile)}</td>`;
+            table += `<td><a href="/author/update/${author.id}">update</a></td>`;
+            table += `<td>
+            <form action="author_delete_process" method="post"> 
+            <input type="hidden" name="id" value="${author.id}"> 
+            <input type="submit" value="delete"> 
+            </form> 
+            </td></tr>`;
+        }
+        table += '</table>';
+        return (table);
+    }
+    getLoginButton(loginStatus) {
+        let loginButton = `<a href="/login">login</a>`;
+        if (loginStatus)
+            loginButton = `<a href="/logout_process">logout</a>`;
+        return (loginButton);
+    }
+}
+
+module.exports = Page;

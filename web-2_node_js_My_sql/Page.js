@@ -59,7 +59,7 @@ class Page {
                 <input type="text" name="name" placeholder="name" value="${sanitizeHtml(obj.authorContent.name)}">
             </p>
             <p>
-                <textarea name="profile" placeholder="profile">${obj.authorContent.profile}</textarea>
+                <textarea name="profile" placeholder="profile">${sanitizeHtml(obj.authorContent.profile)}</textarea>
             </p>
             <p>
                 <input type="submit">
@@ -194,7 +194,7 @@ class Page {
                 <input type="text" name="title" placeholder="title" value="${sanitizeHtml(obj.topicContent.title)}">
             </p>
             <p>
-                <textarea name="description" placeholder="description">${obj.topicContent.description}</textarea>
+                <textarea name="description" placeholder="description">${sanitizeHtml(obj.topicContent.description)}</textarea>
             </p>
             <p>
                 ${this.getAuthorSelector(obj, 'update')}
@@ -236,8 +236,8 @@ class Page {
         <th>delete</th>`;
         for (let author of obj.allAuthors) {
             table += `<tr>`
-            table += `<td>${author.name}</td>`;
-            table += `<td>${author.profile}</td>`;
+            table += `<td>${sanitizeHtml(author.name)}</td>`;
+            table += `<td>${sanitizeHtml(author.profile)}</td>`;
             table += `<td><a href="/author_update?id=${author.id}">update</a></td>`;
             table += `<td>
             <form action="author_delete_process" method="post"> 
